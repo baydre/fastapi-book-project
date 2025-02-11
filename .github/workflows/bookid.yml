@@ -2,7 +2,7 @@ name: bookidEnpoint
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "bookidEndpoint" ]
   pull_request:
     branches: [ "main" ]
 
