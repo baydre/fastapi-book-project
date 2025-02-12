@@ -2,8 +2,9 @@ name: Deploy API
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "bookidEndpoint" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   deploy:
