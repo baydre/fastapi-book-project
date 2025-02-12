@@ -22,16 +22,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Set up SSH key
-        env:
-          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SSH_HOST: ${{ secrets.IP }}
-          SSH_USER: ${{ secrets.SERVER_USER }}
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+          - name: Set up SSH key
+          env:
+            SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+            SSH_HOST: ${{ secrets.HOST }}
+            SSH_USER: ${{ secrets.SSH_USER }}
+          run: |
+            mkdir -p ~/.ssh
+            echo "$SSH_KEY" > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
+            ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts 2>/dev/null
 
       - name: Deploy Application
         env:
