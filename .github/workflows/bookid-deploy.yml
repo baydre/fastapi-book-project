@@ -9,6 +9,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H example.com >> ~/.ssh/known_hosts
+
+      - name: Run SSH command
+        run: ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa user@example.com "echo 'SSH Connection Successful'"
+
       - uses: actions/checkout@v4
       - name: Set up Python 3.10
         uses: actions/setup-python@v3
