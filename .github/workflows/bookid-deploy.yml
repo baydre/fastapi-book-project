@@ -13,7 +13,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Setup SSH Key
+      - name: Setup SSH Agent
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.DO_PRIVATE_KEY }}" > ~/.ssh/id_rsa
@@ -24,16 +24,22 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.DO_USER }}@${{ secrets.DO_IP }} << 'EOF'
             set -e
+
             echo "Navigating to project directory..."
             cd /home/${{ secrets.DO_USER }}/var/www/fastapi-book-project
+
             echo "Pulling latest changes from GitHub..."
             git pull origin main
+
             echo "Activating virtual environment..."
             source venv/bin/activate
+
             echo "Installing dependencies..."
             pip install --upgrade pip
             pip install -r requirements.txt
+
             echo "Restarting FastAPI service..."
             sudo systemctl restart fastapi
+
             echo "Deployment successful!"
           EOF
