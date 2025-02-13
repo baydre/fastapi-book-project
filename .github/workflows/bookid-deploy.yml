@@ -1,29 +1,45 @@
 name: Deploy API
 
 on:
-  pull_request:
-    branches: [ "main" ]
+  push:
+    branches:
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-        
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-          
-      - name: Deploy to server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd /var/www/HNG12/fastapi-book-project
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup SSH Agent
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DO_PUBLIC_KEY }}" > ~/.ssh/id_rsa.pub
+          chmod 644 ~/.ssh/id_rsa.pub
+          ssh-keyscan -H ${{ secrets.DO_IP }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to DigitalOcean Droplet
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.DO_USER }}@${{ secrets.DO_IP }} << 'EOF'
+            set -e
+
+            echo "Navigating to project directory..."
+            cd /home/${{ secrets.DO_USER }}/var/www/fastapi-book-project
+
+            echo "Pulling latest changes from GitHub..."
             git pull origin main
+
+            echo "Activating virtual environment..."
             source venv/bin/activate
+
+            echo "Installing dependencies..."
+            pip install --upgrade pip
             pip install -r requirements.txt
-            systemctl restart fastapi
+
+            echo "Restarting FastAPI service..."
+            sudo systemctl restart fastapi
+
+            echo "Deployment successful!"
+          EOF
