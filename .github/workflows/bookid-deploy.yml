@@ -16,8 +16,8 @@ jobs:
       - name: Setup SSH Agent
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.DO_PUBLIC_KEY }}" > ~/.ssh/id_rsa.pub
-          chmod 644 ~/.ssh/id_rsa.pub
+          echo "${{ secrets.DO_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.DO_IP }} >> ~/.ssh/known_hosts
 
       - name: Deploy to DigitalOcean Droplet
